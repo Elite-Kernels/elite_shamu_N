@@ -1,0 +1,7 @@
+# Execute files in /system/su.d before booting
+service userinit /system/xbin/busybox run-parts /system/su.d
+      oneshot
+      class late_start
+      user root
+      group root
+      seclabel u:r:init:s0
