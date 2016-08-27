@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Path to build your kernel
-  k=~/Android/Kernels/elite_shamu
+  k=~/Android/Kernels/elite_shamu_N
 # Directory for the any kernel updater
   t=$k/packagesn
 # Date to add to zip
