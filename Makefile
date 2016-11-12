@@ -376,17 +376,13 @@ KBUILD_CPPFLAGS := -D__KERNEL__
 KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common \
 		   -Werror-implicit-function-declaration \
-		   -Wno-format-security -Wno-unused -Wno-maybe-uninitialized \
-                   -Wno-array-bounds -Wno-memset-transposed-args \
+		   -Wno-format-security \
                    -mtune=cortex-a15 \
                    -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-tree-vectorize -ffast-math \
                    -funswitch-loops -fpredictive-commoning -fgcse-after-reload \
 		   -fno-aggressive-loop-optimizations \
 		   -fno-delete-null-pointer-checks \
 		   -std=gnu89
-
-# GCC 6.1 is too strict
-KBUILD_CFLAGS	+= -Wno-misleading-indentation -Wno-tautological-compare
 
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
