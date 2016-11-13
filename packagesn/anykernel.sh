@@ -67,18 +67,30 @@ write_boot() {
     secondoff=`cat *-secondoff`;
     secondoff="--second_offset $secondoff";
   fi;
-  if [ -f /tmp/anykernel/zImage-dtb ]; then
+  if [ -f /tmp/anykernel/zImage ]; then
+    kernel=/tmp/anykernel/zImage;
+  elif [ -f /tmp/anykernel/zImage-dtb ]; then
     kernel=/tmp/anykernel/zImage-dtb;
   else
-    kernel=`ls *-zImage-dtb`;
+    kernel=`ls *-zImage`;
     kernel=$split_img/$kernel;
   fi;
-  cd $ramdisk;
-  find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
+  if [ -f /tmp/anykernel/dtb ]; then
+    dtb="--dt /tmp/anykernel/dtb";
+  elif [ -f *-dtb ]; then
+    dtb=`ls *-dtb`;
+    dtb="--dt $split_img/$dtb";
+  fi;
+  if [ -f "$bin/mkbootfs" ]; then
+    $bin/mkbootfs /tmp/anykernel/ramdisk | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
+  else
+    cd $ramdisk;
+    find . | cpio -H newc -o | gzip > /tmp/anykernel/ramdisk-new.cpio.gz;
+  fi;
   if [ $? != 0 ]; then
     ui_print " "; ui_print "Repacking ramdisk failed. Aborting..."; exit 1;
   fi;
-  $bin/mkbootimg --kernel $kernel --ramdisk /tmp/anykernel/ramdisk-new.cpio.gz $second --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff $secondoff --tags_offset $tagsoff  --output /tmp/anykernel/boot-new.img;
+  $bin/mkbootimg --kernel $kernel --ramdisk /tmp/anykernel/ramdisk-new.cpio.gz $second --cmdline "$cmdline" --board "$board" --base $base --pagesize $pagesize --kernel_offset $kerneloff --ramdisk_offset $ramdiskoff $secondoff --tags_offset $tagsoff $dtb --output /tmp/anykernel/boot-new.img;
   if [ $? != 0 ]; then
     ui_print " "; ui_print "Repacking image failed. Aborting..."; exit 1;
   elif [ `wc -c < /tmp/anykernel/boot-new.img` -gt `wc -c < /tmp/anykernel/boot.img` ]; then
@@ -105,14 +117,25 @@ replace_string() {
 
 # replace_section <file> <begin search string> <end search string> <replacement string>
 replace_section() {
-  line=`grep -n "$2" $1 | head -n1 | cut -d: -f1`;
-  sed -i "/${2//\//\\/}/,/${3//\//\\/}/d" $1;
-  sed -i "${line}s;^;${4}\n;" $1;
+  begin=`grep -n "$2" $1 | head -n1 | cut -d: -f1`;
+  for end in `grep -n "$3" $1 | cut -d: -f1`; do
+    if [ "$begin" -lt "$end" ]; then
+      sed -i "/${2//\//\\/}/,/${3//\//\\/}/d" $1;
+      sed -i "${begin}s;^;${4}\n;" $1;
+      break;
+    fi;
+  done;
 }
 
 # remove_section <file> <begin search string> <end search string>
 remove_section() {
-  sed -i "/${2//\//\\/}/,/${3//\//\\/}/d" $1;
+  begin=`grep -n "$2" $1 | head -n1 | cut -d: -f1`;
+  for end in `grep -n "$3" $1 | cut -d: -f1`; do
+    if [ "$begin" -lt "$end" ]; then
+      sed -i "/${2//\//\\/}/,/${3//\//\\/}/d" $1;
+      break;
+    fi;
+  done;
 }
 
 # insert_line <file> <if search string> <before|after> <line match string> <inserted line>
