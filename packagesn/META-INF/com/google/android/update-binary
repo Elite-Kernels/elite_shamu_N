@@ -69,7 +69,7 @@ ui_print " ";
 ui_print "Mounting System";
 ui_print " ";
 ui_print " ";
-mount -o ro /system;
+mount -o ro -t auto /system;
 mount /data;
 
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.devicecheck)" == 1 ]; then
@@ -91,7 +91,7 @@ fi;
 ui_print "Pushing Scripts...";
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.system)" == 1 ]; then
   ui_print " ";
-  mount -o remount,rw /system;
+  mount -o rw,remount -t auto /system;
   if [ -d "$system/su.d" ]
   then  
     cp -rf /tmp/anykernel/system/su.d/* /system/su.d/;
@@ -101,6 +101,7 @@ if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.system)" == 1 ]; then
     cp -rf /tmp/anykernel/system/su.d/* /system/su.d/;
     set_perm_recursive 0 0 0755 0755 /system/su.d;
   fi;
+  mount -o ro,remount -t auto /system;
 fi;
 
 ui_print "Cleaning up";
