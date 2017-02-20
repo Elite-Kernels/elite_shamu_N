@@ -69,8 +69,10 @@ ui_print " ";
 ui_print "Mounting System";
 ui_print " ";
 ui_print " ";
+umount /system;
 mount -o ro -t auto /system;
 mount /data;
+test -f /system/system/build.prop && root=/system;
 
 if [ "$(file_getprop /tmp/anykernel/anykernel.sh do.devicecheck)" == 1 ]; then
   ui_print "Checking device...";
