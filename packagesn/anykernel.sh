@@ -8,6 +8,7 @@ do.devicecheck=1
 do.initd=1
 do.system=1
 do.cleanup=1
+do.cleanuponabort=0
 device.name1=shamu
 
 # shell variables
