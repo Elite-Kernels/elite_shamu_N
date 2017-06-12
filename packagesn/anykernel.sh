@@ -2,7 +2,8 @@
 # osm0sis @ xda-developers
 
 ## AnyKernel setup
-# EDIFY properties
+# begin properties
+properties() {
 kernel.string=-Elite
 do.devicecheck=1
 do.initd=1
@@ -10,6 +11,7 @@ do.system=1
 do.cleanup=1
 do.cleanuponabort=0
 device.name1=shamu
+} # end properties
 
 # shell variables
 block=/dev/block/platform/msm_sdcc.1/by-name/boot;
